@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>推箱子</title>
+		<style type="text/css">
+			#content {
+				width: 960px;
+				margin: 0 auto;
+				text-align: center;
+			}
+			td.cell {
+				width:64px;
+				height:64px;
+				background-color:#afe89e; 
+			}
+			td.control {
+				width:64px;
+				height:64px;
+				background-color:#dfbc2d; 
+			}
+			table {
+				margin: 0 auto;
+			}
+		</style>
+		<script language="javascript">
+			const WIDTH = 8;
+			const HEIGHT = 6;
+
+			const LEFT = 0;
+			const RIGHT = 1;
+			const UP = 2;
+			const DOWN = 3;
+
+			var pig_img = '<img src="img/pig.png">';
+			var box_img = '<img src="img/box.png">';
+			var wall_img = '<img src="img/wall.png">';
+			var normal_color = "#afe89e";
+			var dest_color = "#e8fa84";
+
+			// 地图，8x6，p：猪  b:箱  w:墙  d：目标
+			var map = [
+				" ", " ", " ", " ", " ", " ", " ", " ",
+				" ", " ", " ", "w", " ", " ", " ", " ",
+				" ", " ", "p", "w", " ", "b", " ", "d",
+				" ", " ", " ", "w", " ", " ", " ", " ",
+				" ", " ", " ", " ", " ", " ", " ", " ",
+				" ", " ", " ", " ", " ", " ", " ", " "
+			]
+
+			function nextPosition(id, direction) {
+				var x = id % WIDTH;
+				var y = Math.floor(id / WIDTH);
+				switch (direction) {
+					case LEFT: return (x <= 0) ? null : (x - 1) + y * WIDTH;
+					case RIGHT: return (x >= WIDTH - 1) ? null : (x + 1) + y * WIDTH;
+					case UP: return (y <= 0) ? null : x + (y - 1) * WIDTH;
+					case DOWN: return (y >= HEIGHT - 1) ? null : x + (y + 1) * WIDTH;
+					default: return null;
+				}
+			}
+
+			function move(id, direction) {
+				// 当前格子没东西
+				var img = document.getElementById("td["+id+"]").innerHTML;
+				if (img == "") {
+					return true;
+				}
+				// 当前格子是墙
+				if (img == wall_img) {
+					return false;
+				}
+				// 计算新的格子
+				var newId = nextPosition(id, direction);
+				if (newId == null) {
+					return false;  // 已经触及边界
+				}
+				// 递归移动
+				if (!move(newId, direction)) {
+					return false;
+				}
+				// 移动
+				document.getElementById("td["+id+"]").innerHTML = "";
+				document.getElementById("td["+newId+"]").innerHTML = img;
+				return true;
+			}
+
+			// 获取当前小猪位置
+			function getCursor() {
+				for (i = 0; i < WIDTH * HEIGHT; i++) {
+					var img = document.getElementById("td["+i+"]").innerHTML;
+					if (img == pig_img) {
+						return i;
+					}
+				}
+				return -1;
+			}
+
+			// 检查是否通关
+			function isPass() {
+				for (i = 0; i < WIDTH * HEIGHT; i++) {
+					var img = document.getElementById("td["+i+"]").innerHTML;
+					if (map[i] == "d" && img != box_img) {
+						return false;
+					}
+				}
+				return true;
+			}
+
+			function keyEvent(direction) {
+				var id = getCursor();
+				if (id == -1) {
+					alert("小猪不见啦！重新开始游戏吧~");
+					return;
+				}
+				move(id, direction);
+				if (isPass()) {
+					alert("通关！");
+				}
+			}
+
+			function GameStart() {
+				for (i = 0; i < WIDTH * HEIGHT; i++) {
+					var img;
+					var bg;
+					switch (map[i]) {
+						case "p":
+							img = pig_img;
+							bg = normal_color;
+							break;
+						case "b":
+							img = box_img;
+							bg = normal_color;
+							break;
+						case "w":
+							img = wall_img;
+							bg = normal_color;
+							break;
+						case "d":
+							img = "";
+							bg = dest_color;
+							break;
+						default:
+							img = "";
+							bg = normal_color;
+							break;
+					}
+					document.getElementById("td["+i+"]").innerHTML = img;
+					document.getElementById("td["+i+"]").style.backgroundColor = bg;
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="content">
+			<form name="form1">
+				<label>选关：</label>
+				<select name="level">
+					<option value="1">1</option>
+				 </select>
+			</form>
+			<input type="button" value="开始游戏" onclick="GameStart()">
+			<table>
+				<tr>
+					<td class="cell" id="td[0]"></td>
+					<td class="cell" id="td[1]"></td>
+					<td class="cell" id="td[2]"></td>
+					<td class="cell" id="td[3]"></td>
+					<td class="cell" id="td[4]"></td>
+					<td class="cell" id="td[5]"></td>
+					<td class="cell" id="td[6]"></td>
+					<td class="cell" id="td[7]"></td>
+				</tr>
+				<tr>
+					<td class="cell" id="td[8]"></td>
+					<td class="cell" id="td[9]"></td>
+					<td class="cell" id="td[10]"></td>
+					<td class="cell" id="td[11]"></td>
+					<td class="cell" id="td[12]"></td>
+					<td class="cell" id="td[13]"></td>
+					<td class="cell" id="td[14]"></td>
+					<td class="cell" id="td[15]"></td>
+				</tr>
+				<tr>
+					<td class="cell" id="td[16]"></td>
+					<td class="cell" id="td[17]"></td>
+					<td class="cell" id="td[18]"></td>
+					<td class="cell" id="td[19]"></td>
+					<td class="cell" id="td[20]"></td>
+					<td class="cell" id="td[21]"></td>
+					<td class="cell" id="td[22]"></td>
+					<td class="cell" id="td[23]"></td>
+				</tr>
+					<td class="cell" id="td[24]"></td>
+					<td class="cell" id="td[25]"></td>
+					<td class="cell" id="td[26]"></td>
+					<td class="cell" id="td[27]"></td>
+					<td class="cell" id="td[28]"></td>
+					<td class="cell" id="td[29]"></td>
+					<td class="cell" id="td[30]"></td>
+					<td class="cell" id="td[31]"></td>
+				<tr>
+					<td class="cell" id="td[32]"></td>
+					<td class="cell" id="td[33]"></td>
+					<td class="cell" id="td[34]"></td>
+					<td class="cell" id="td[35]"></td>
+					<td class="cell" id="td[36]"></td>
+					<td class="cell" id="td[37]"></td>
+					<td class="cell" id="td[38]"></td>
+					<td class="cell" id="td[39]"></td>
+				</tr>
+				<tr>
+					<td class="cell" id="td[40]"></td>
+					<td class="cell" id="td[41]"></td>
+					<td class="cell" id="td[42]"></td>
+					<td class="cell" id="td[43]"></td>
+					<td class="cell" id="td[44]"></td>
+					<td class="cell" id="td[45]"></td>
+					<td class="cell" id="td[46]"></td>
+					<td class="cell" id="td[47]"></td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td class="control"></td>
+					<td class="control" onclick="keyEvent(UP)">UP</td>
+					<td class="control"></td>
+				</tr>
+				<tr>
+					<td class="control" onclick="keyEvent(LEFT)">LEFT</td>
+					<td class="control"></td>
+					<td class="control" onclick="keyEvent(RIGHT)">RIGHT</td>
+				</tr>
+				<tr>
+					<td class="control"></td>
+					<td class="control" onclick="keyEvent(DOWN)">DOWN</td>
+					<td class="control"></td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>
