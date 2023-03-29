@@ -37,15 +37,26 @@
 			var wall_img = '<img src="img/wall.png">';
 			var normal_color = "#afe89e";
 			var dest_color = "#e8fa84";
+			var mapId = 0;
 
 			// 地图，8x6，p：猪  b:箱  w:墙  d：目标
-			var map = [
-				" ", " ", " ", " ", " ", " ", " ", " ",
-				" ", " ", " ", "w", " ", " ", " ", " ",
-				" ", " ", "p", "w", " ", "b", " ", "d",
-				" ", " ", " ", "w", " ", " ", " ", " ",
-				" ", " ", " ", " ", " ", " ", " ", " ",
-				" ", " ", " ", " ", " ", " ", " ", " "
+			var maps = [
+				[
+					" ", " ", " ", " ", " ", " ", " ", " ",
+					" ", " ", " ", "w", " ", " ", " ", " ",
+					" ", " ", "p", "w", " ", "b", " ", "d",
+					" ", " ", " ", "w", " ", " ", " ", " ",
+					" ", " ", " ", " ", " ", " ", " ", " ",
+					" ", " ", " ", " ", " ", " ", " ", " "
+				],
+				[
+					"w", "w", "w", "w", "w", "w", "w", " ",
+					"w", "d", "b", " ", " ", "d", "w", " ",
+					"w", " ", "b", "p", "b", " ", "w", " ",
+					"w", "d", " ", " ", "b", "d", "w", " ",
+					"w", "w", "w", "w", "w", "w", "w", " ",
+					" ", " ", " ", " ", " ", " ", " ", " "
+				]
 			]
 
 			function nextPosition(id, direction) {
@@ -100,7 +111,7 @@
 			function isPass() {
 				for (i = 0; i < WIDTH * HEIGHT; i++) {
 					var img = document.getElementById("td["+i+"]").innerHTML;
-					if (map[i] == "d" && img != box_img) {
+					if (maps[mapId][i] == "d" && img != box_img) {
 						return false;
 					}
 				}
@@ -120,10 +131,11 @@
 			}
 
 			function GameStart() {
+				mapId = document.getElementById("level").value - 1;
 				for (i = 0; i < WIDTH * HEIGHT; i++) {
 					var img;
 					var bg;
-					switch (map[i]) {
+					switch (maps[mapId][i]) {
 						case "p":
 							img = pig_img;
 							bg = normal_color;
@@ -155,9 +167,7 @@
 		<div id="content">
 			<form name="form1">
 				<label>选关：</label>
-				<select name="level">
-					<option value="1">1</option>
-				 </select>
+				<input id="level" type="number" value="1" min="1" max="2"/>
 			</form>
 			<input type="button" value="开始游戏" onclick="GameStart()">
 			<table>
